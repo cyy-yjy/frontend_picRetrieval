@@ -1,4 +1,6 @@
 import './assets/main.css'
+import "@flaticon/flaticon-uicons/css/all/all.css"; 
+// 全局引入flaticon
 
 import { createApp } from 'vue'
 import App from './App.vue'
