@@ -12,6 +12,7 @@
     "@element-plus/icons-vue": "^2.3.1",
     "@flaticon/flaticon-uicons": "^3.2.1",
     "element-plus": "^2.7.3",
+    "particles.vue3": "^1.43.1",
     "vue": "^3.4.21",
     "vue-router": "^4.3.0"
   },

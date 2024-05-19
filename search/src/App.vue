@@ -1,12 +1,15 @@
 <script setup>
 import { RouterLink, RouterView } from 'vue-router'
+import { particles } from '@/components/particles/1.js'
 //
 </script>
 
 <template>
+  <el-container>
+  <!-- <Particles id="tsparticles" class="login__particles" :options="particles" /> -->
+  <el-header>
     <el-menu
       :default-active="activeIndex2"
-      class="el-menu-demo"
       mode="horizontal"
       position= fixed 
     top= 0
@@ -23,10 +26,13 @@ import { RouterLink, RouterView } from 'vue-router'
       <el-menu-item index="1">图片搜索</el-menu-item>
       <el-menu-item index="2">我的喜欢</el-menu-item>
     </el-menu>
+    </el-header>
     <h1 class="test">标题</h1>
-    <div class="page">
+    <el-main>
   <router-view/>
-  </div>
+  </el-main>
+  </el-container>
+
 </template>
 <script>
 import { ref } from 'vue'
@@ -54,5 +60,9 @@ const handleSelect = (index) => {
 }
 .page{
   margin-top: 100px;
+}
+.login__particles{
+  z-index: -1;
+  opacity: 0.7;
 }
 </style>

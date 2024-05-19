@@ -8,6 +8,7 @@ import router from './router'
 import ElementPlus from "element-plus";
 import "element-plus/dist/index.css";
 import * as ElementPlusIconsVue from "@element-plus/icons-vue";
+import Particles from "particles.vue3";
 
 const app = createApp(App)
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
@@ -15,4 +16,5 @@ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
 }
 app.use(router)
 app.use(ElementPlus);
+app.use(Particles);
 app.mount('#app')

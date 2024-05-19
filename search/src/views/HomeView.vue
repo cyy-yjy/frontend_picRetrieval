@@ -4,6 +4,10 @@
   <h3>{{ topost }}</h3>
   <div class="upload">
     <!-- 实际上，这里只需要获取图片的name就行啦 -->
+    <el-button round type="danger" plain @click="imageLike">
+          <i class="fi fi-rr-heart" v-show="!likeThis"></i>
+          <i class="fi fi-sr-heart" v-show="likeThis"></i>
+        </el-button>
     <el-upload
       class="avatar-uploader"
       :show-file-list="false"
@@ -20,8 +24,6 @@
               <el-input v-model="inputNumber" @click="clearErrorBorder" type="number" step="1" min="0"/>
           <div class="errorText">{{ errorMsg }}</div>
             </el-form-item>
-    <!-- 做一个搜索框 -->
-    <el-input v-model="input" style="width: 240px" placeholder="Please input" clearable :suffix-icon="Search" />
     <!-- 加一个按钮可以撤回对标签的修改 -->
     <el-tooltip content="撤销修改" effect="customized" class="box-item" placement="right">
       <el-button :icon="RefreshLeft" circle @click="withdrawTags"/>
@@ -36,8 +38,6 @@
   <el-button @click="onSubmit"> 搜索</el-button>
   <el-button @click="onlyLike" :class="{ 'custom-like-button': like, 'custom-dislike-button': !like }"  
       > 只看喜欢</el-button>
-  <el-button> 换图片</el-button>
-  <el-button> 筛选</el-button>
   <img style="width: 100px; height: 100px" :src="url2" />
   <!-- 显示当前结果数量 -->
   <div>
@@ -47,7 +47,7 @@
   <!-- 做一个卡片，它包括image，button -->
   <div v-for="(item, index) in list" :key="index" v-show="tagInList(item)">
     <el-card  style="max-width: 480px" shadow="hover" 
-    v-show="!like ||item.isCollected">
+     v-show="!like || item.isCollected">
       <!-- 它还有一个标题 -->
       <template #header>{{item.name}}</template>
       <el-image style="width: 100px; height: 100px" :src="srcList[index]"
@@ -76,6 +76,7 @@ const imageUrl = ref('')
 const inputNumber = ref(9)
 const isError = ref(false)
 const errorMsg = ref('')
+const likeThis=ref(false)
 const tagInList = (item) => {
   return tags.value.some(a => a.checked && item.tags.includes(a.name));
 }
@@ -95,52 +96,53 @@ const shouldShow = (item) => {
     return false;
   return !like.value || item.isCollected
 }
-const list = ref([
-  {
-    id: 3,
-    name: 'im3.jpg',
-    isCollected: true,
-    tags: ['tag1', 'tag2', 'tag3']
-  },
-  {
-    id: 4,
-    name: 'im4.jpg',
-    isCollected: false,
-    tags: ['tag2', 'tag4']
-  },
-  {
-    id: 5,
-    name: 'im5.jpg',
-    isCollected: false,
-    tags: ['tag2', 'tag1']
-  },
-  // ... 可以继续添加更多项  
-]);
+const list = ref([]);
 const like = ref(false)
 const onlyLike = () => {
   like.value = !like.value
   console.log(like.value)
   getans_count()
 }
-const likelist = ref([])//只存name
 const url2= new URL('@/assets/dataset/im2.jpg', import.meta.url).href
-const input = ref()
 const todisplay = ref()
 const topost = ref()
 const url = ref()
-const handleLike = (item) => {
+const handleLike = async(item) => {
   item.isCollected = !item.isCollected
-
+  //向后端传递请求
+   try {
+    const formData = new FormData(); // 创建一个新的 FormData 实例  
+     formData.append('filename', item.name); 
+     formData.append('like', item.isCollected?1:0);
+     const newdata =  await origin.likeImage(formData);
+    console.log('数据保存成功,msg为'+newdata)
+  } catch (error) {
+    console.error('点赞时出错：', error);
+  }
 }
+const imageLike =async () => {
+  likeThis.value = !likeThis.value
+  //向后端传递请求
+  try {
+    const formData = new FormData(); // 创建一个新的 FormData 实例  
+    formData.append('filename', uploadImg.value);
+    formData.append('like', likeThis.value ? 1 : 0);
+    const newdata = await origin.likeImage(formData);
+    console.log('数据保存成功,msg为' + newdata)
+  } catch (error) {
+    console.error('点赞时出错：', error);
+  }
+}
+const uploadImg=ref()
 const handleTest = (newFile) => {
   console.log(newFile.name)
+  uploadImg.value= newFile.name
   let new_url = new URL(transformImagePath(newFile.name), import.meta.url).href
   console.log(new_url)
   console.log(url2)
   imageUrl.value = new_url
 }
 const tags = ref([])
-const forever_tags=ref([])
 const srcList = ref([
 ])
 const getTestData = async () => {
@@ -152,9 +154,6 @@ const getTestData = async () => {
     console.error('Error fetching data:', error);
   }
 };
-const handleClose = (index) => {
-  tags.value.splice(index, 1);
-}
 const postTest = async () => {
   try {
     const formData = new FormData();
@@ -183,7 +182,7 @@ function transformImagePath(path) {
   // 构造新路径，使用 '@/dataset/' 作为前缀并接上文件名  
   return `../assets/dataset/${fileName}`;
 }
-const onSubmit = () => {
+const onSubmit = async() => {
   errorMsg.value = "";
   isError.value = false;
   let inputNumberValue = parseInt(inputNumber.value, 10);
@@ -192,14 +191,28 @@ const onSubmit = () => {
     isError.value = true
     return
   }
-  likelist.value = [];
-  //在开始请求前，要把当前的like信息传回去
-  list.value.forEach(item => {
-    if (item.isCollected == true)
-      likelist.value.push(item.name)
-  });
-  console.log(likelist)
   //然后开始执行请求
+  try {
+    const formData = new FormData(); // 创建一个新的 FormData 实例  
+    formData.append('filename', uploadImg.value); 
+    formData.append('queryNumber', inputNumber.value);
+    const newdata = await origin.doimgUpload(formData);
+    //console.log(newdata.like)
+    likeThis.value = newdata.like
+    tags.value = newdata.tags.map(item => ({
+      name: item,
+      checked: true
+    }))
+    list.value = newdata.list.map(item => ({
+      name: item.filename,
+      isCollected: item.isCollected,
+      tags:item.tags
+    }))
+    console.log(list)
+    console.log('数据保存成功')
+  } catch (error) {
+    console.error('往后端传图片时出错：', error);
+  }
   //然后更新页面
   //根据list更新srcList
   // 清空 srcList  
@@ -208,36 +221,24 @@ const onSubmit = () => {
   list.value.forEach(item => {
     // 使用 item.name 调用 transformImagePath 并创建一个新的 URL 对象  
     const url = new URL(transformImagePath(item.name), import.meta.url);
-    // 将新 URL 的 href 添加到 srcList 中  
-    srcList.value.push(url.href);
-  });
-}
-const getans_count = () => {
-  ans_count.value= list.value.filter(item => shouldShow(item)).length;
-}
-onMounted(async () => {
-  inputNumber.value=9
-  url.value = transformImagePath('/im2.jpg')
-  console.log(url.value)
-  tags.value = [
-    {
-      name: 'tag1',
-      checked:true
-    },
-    {
-      name: 'tag2',
-      checked: true
-    }
-  ]
-  srcList.value = [];
-  // 遍历 list 中的每个对象  
-  list.value.forEach(item => {
-    // 使用 item.name 调用 transformImagePath 并创建一个新的 URL 对象  
-    const url = new URL(transformImagePath(item.name), import.meta.url);
+    console.log(url.href)
     // 将新 URL 的 href 添加到 srcList 中  
     srcList.value.push(url.href);
   });
   getans_count()
+}
+const getans_count = () => {
+  ans_count.value= list.value.filter(item => shouldShow(item)).length;
+}
+onMounted(() => {
+  inputNumber.value=9
+  url.value = transformImagePath('/im2.jpg')
+  console.log(url.value)
+  tags.value = [
+  ]
+  srcList.value = [];
+  list.value=[]
+  ans_count.value=0
 })
 
 </script>

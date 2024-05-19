@@ -8,7 +8,7 @@ export default {
         mode: "cors"
       });
     
-    const data = await response.json();
+      const data = await response.json();
       console.log("后端响应:", data);
       return data;
     }
@@ -18,24 +18,55 @@ export default {
   },
   async doimgUpload(UploadData) {
     try {
-      const response = await fetch("/api/imgUpload", {
+      const backend = await fetch("/api/imgUpload", {
         method: "POST",
-        body: UploadData,
-        mode: "cors",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(UploadData),
       });
-     if (!response.ok) {
-       throw new Error("网络请求错误");
-     }
-     if (response.redirected) {
-       // 处理重定向
-       console.log("发生重定向，重定向地址:", response.url);
-     } else {
-       const data = await response.json();
-       console.log("后端响应:", data);
-       return data;
-     }
+      const jsonData =await backend.json();
+      console.log("jsonData: ", jsonData);     
+      if (jsonData.response.isError) {
+        console.log(jsonData.response.msg)
+        throw new Error("网络请求错误");
+      }
+      return jsonData.response.data
     } catch (error) {
       throw error;
     }
   },
-};
+  async likeImage(UploadData) {
+    try {
+      const backend = await fetch("/api/likeImage", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(UploadData),
+      });
+      const jsonData = await backend.json();
+      if (jsonData.response.isError) {
+        console.log(jsonData.response.msg);
+        throw new Error("网络请求错误");
+      }
+      return jsonData.response.msg;
+    } catch (error) {
+      throw error;
+    }
+  },
+  async getAllLikes() {
+    try {
+      const backend = await fetch("/api/getAllLikes");
+      const jsonData = await backend.json();
+      console.log("getAllLikes: ", jsonData); 
+      if (jsonData.response.isError) {
+        console.log(jsonData.response.msg);
+        throw new Error("网络请求错误");
+      }
+      return jsonData.response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+}
