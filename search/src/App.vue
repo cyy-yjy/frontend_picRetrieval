@@ -16,7 +16,6 @@ import { particles } from '@/components/particles/1.js'
           <el-menu-item index="2" class="inRight">我的喜欢</el-menu-item>
         </el-menu>
       </el-header>
-      <h1 class="test">标题</h1>
       <el-main>
         <router-view />
       </el-main>

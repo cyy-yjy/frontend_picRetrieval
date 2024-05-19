@@ -26,12 +26,12 @@ export default {
         body: JSON.stringify(UploadData),
       });
       const jsonData =await backend.json();
-      console.log("jsonData: ", jsonData);     
+      console.log("jsonData: ", jsonData);  
       if (jsonData.response.isError) {
-        console.log(jsonData.response.msg)
+        console.log(jsonData.response.msg);
         throw new Error("网络请求错误");
       }
-      return jsonData.response.data
+      return jsonData.response.data;
     } catch (error) {
       throw error;
     }
@@ -43,9 +43,10 @@ export default {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(UploadData),
+        body: JSON.stringify(UploadData)
       });
       const jsonData = await backend.json();
+      console.log("jsonData: ", jsonData); 
       if (jsonData.response.isError) {
         console.log(jsonData.response.msg);
         throw new Error("网络请求错误");

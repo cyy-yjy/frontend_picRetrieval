@@ -1,10 +1,9 @@
 <template>
   <!-- 首先是标题 -->
-  <h1>home page</h1>
-  <h2>{{ todisplay }}</h2>
-  <h3>{{ topost }}</h3>
+  <h1 class="my_header1">上传图片吧！</h1>
   <div class="upload">
     <!-- 实际上，这里只需要获取图片的name就行啦 -->
+
     <el-button round type="danger" plain @click="imageLike">
           <i class="fi fi-rr-heart" v-show="!likeThis"></i>
           <i class="fi fi-sr-heart" v-show="likeThis"></i>
@@ -15,7 +14,7 @@
       :auto-upload="false"
       :on-change="handleTest"
     >
-      <img v-if="imageUrl" :src="imageUrl" />
+      <el-image v-if="imageUrl" :src="imageUrl" class="avatar" fit="contain"/>
       <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
     </el-upload>
   </div>
@@ -112,10 +111,12 @@ const handleLike = async(item) => {
   item.isCollected = !item.isCollected
   //向后端传递请求
    try {
-    const formData = new FormData(); // 创建一个新的 FormData 实例  
-     formData.append('filename', item.name); 
-     formData.append('like', item.isCollected?1:0);
-     const newdata =  await origin.likeImage(formData);
+     const formData = {
+       info:{filename: item.name,
+      like: item.isCollected ? 1 : 0}
+     }  
+    console.log("like=",formData.info.like)
+    const newdata =  await origin.likeImage(formData);
     console.log('数据保存成功,msg为'+newdata)
   } catch (error) {
     console.error('点赞时出错：', error);
@@ -125,9 +126,12 @@ const imageLike =async () => {
   likeThis.value = !likeThis.value
   //向后端传递请求
   try {
-    const formData = new FormData(); // 创建一个新的 FormData 实例  
-    formData.append('filename', uploadImg.value);
-    formData.append('like', likeThis.value ? 1 : 0);
+    const formData = {
+      info: {
+        filename: uploadImg.value,
+        like: likeThis.value ? 1 : 0
+      }
+    }
     const newdata = await origin.likeImage(formData);
     console.log('数据保存成功,msg为' + newdata)
   } catch (error) {
@@ -166,16 +170,6 @@ const postTest = async () => {
     console.error('往后端传数据时出错：', error);
   }
 };
-const handleFileChange = async (newFile) => {
-  try {
-    const formData = new FormData(); // 创建一个新的 FormData 实例  
-    formData.append('file', newFile); // 添加文件到 FormData，键名为 'file'
-    await origin.doimgUpload(formData);
-    console.log('数据保存成功')
-  } catch (error) {
-    console.error('往后端传图片时出错：', error);
-  }
-}
 //写一个函数用来把路径转成本地地址
 function transformImagePath(path) {
   // 提取文件名（即最后一个 '/' 之后的部分）  
@@ -194,9 +188,11 @@ const onSubmit = async() => {
   }
   //然后开始执行请求
   try {
-    const formData = new FormData(); // 创建一个新的 FormData 实例  
-    formData.append('filename', uploadImg.value); 
-    formData.append('queryNumber', inputNumber.value);
+    const formData = {
+      info:{filename: uploadImg.value,
+      queryNumber: inputNumberValue}
+    }  
+    console.log(inputNumberValue)
     const newdata = await origin.doimgUpload(formData);
     //console.log(newdata.like)
     likeThis.value = newdata.like
@@ -245,6 +241,10 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.avatar-uploader .avatar {
+  width: 178px;
+  height: 178px;
+}
 .custom-like-button {  
   color: #b15fe1; /* 当喜欢时为这个颜色 */  
   /* 可以添加更多样式 */  
@@ -273,6 +273,11 @@ onMounted(() => {
 }
 </style>
 <style>
+.my_header1{
+  padding-top: 10px;
+  margin-bottom: 30px;
+  font-size: xx-large;
+}
 .el-popper.is-customized {
   /* Set padding to ensure the height is 32px */
   padding: 6px 12px;

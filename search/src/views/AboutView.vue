@@ -1,5 +1,5 @@
 <template>
-    <h1>这里展示您收藏过的图片</h1>
+    <h1 class="my_header1">这些是您喜欢的图片</h1>
     <el-button @click="refreshLike"> 刷新</el-button>
     <!-- 用一个标签显示目前有多少个喜欢的图片 -->
     <div>
@@ -61,9 +61,12 @@ const handleLike = async (item) => {
         ans_count.value--;
     //向后端传递请求
     try {
-        const formData = new FormData(); // 创建一个新的 FormData 实例  
-        formData.append('filename', item.name);
-        formData.append('like', item.isCollected ? 1 : 0);
+        const formData = {
+            info: {
+                filename: item.name,
+                like: item.isCollected ? 1 : 0
+            }
+        }
         const newdata = await origin.likeImage(formData);
         console.log('修改点赞状态成功,msg为' + newdata)
     } catch (error) {
