@@ -1,4 +1,5 @@
 <template>
+  <!-- 首先是标题 -->
   <h1>home page</h1>
   <h2>{{ todisplay }}</h2>
   <h3>{{ topost }}</h3>
