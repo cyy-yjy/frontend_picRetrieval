@@ -1,91 +1,123 @@
 <template>
   <!-- 首先是标题 -->
   <h1 class="my_header1">上传图片吧！</h1>
-  <div class="upload">
-    <!-- 实际上，这里只需要获取图片的name就行啦 -->
-
-    <el-button round type="danger" plain @click="imageLike">
+  <el-row :gutter="24">
+    <el-col :span="12">
+      <!-- 通过span确定了这块区域占多大 -->
+      <div class="color_light">
+        <!-- 实际上，这里只需要获取图片的name就行啦 -->
+        <el-upload class="avatar-uploader" :show-file-list="false" :auto-upload="false" :on-change="handleTest">
+          <el-image v-if="imageUrl" :src="imageUrl" class="avatar_image" fit="scale-down" />
+          <el-icon v-else class="avatar-uploader-icon">
+            <Plus />
+          </el-icon>
+        </el-upload>
+        <el-button type="danger" plain @click="imageLike" class="recButton">
           <i class="fi fi-rr-heart" v-show="!likeThis"></i>
           <i class="fi fi-sr-heart" v-show="likeThis"></i>
         </el-button>
-    <el-upload
-      class="avatar-uploader"
-      :show-file-list="false"
-      :auto-upload="false"
-      :on-change="handleTest"
-    >
-      <el-image v-if="imageUrl" :src="imageUrl" class="avatar" fit="contain"/>
-      <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
-    </el-upload>
-  </div>
-  <div class="search">
-    <!-- 用户可以输入数字，决定搜索多少张图片 -->
-    <el-form-item label="搜索数量" v-bind:class="{ error: isError }">
-              <el-input v-model="inputNumber" @click="clearErrorBorder" type="number" step="1" min="0"/>
-          <div class="errorText">{{ errorMsg }}</div>
-            </el-form-item>
-    <!-- 加一个按钮可以撤回对标签的修改 -->
-    <el-tooltip content="撤销修改" effect="customized" class="box-item" placement="right">
-      <el-button :icon="RefreshLeft" circle @click="withdrawTags"/>
-    </el-tooltip>
-    <!-- 做一些标签，可以选择是否删掉 -->
-    <el-check-tag v-for="(tag, index) in tags" :key="index" :checked="tag.checked" @change="onChange(tag)" type="warning"
-      :disable-transitions="false" effect="dark">
-      {{ tag.name }}
-    </el-check-tag>
-  </div>
-  <!-- 加一个按钮，可以只看喜欢 -->
-  <el-button @click="onSubmit"> 搜索</el-button>
-  <el-button @click="onlyLike" :class="{ 'custom-like-button': like, 'custom-dislike-button': !like }"  
-      > 只看喜欢</el-button>
-  <img style="width: 100px; height: 100px" :src="url2" />
-  <!-- 显示当前结果数量 -->
-  <div>
-    当前结果数量：{{ ans_count }}
-  </div>
-  <!-- 构建一个有9张图的图片墙 -->
-  <!-- 做一个卡片，它包括image，button -->
-  <div v-for="(item, index) in list" :key="index" v-show="tagInList(item)">
-    <el-card  style="max-width: 480px" shadow="hover" 
-     v-show="!like || item.isCollected">
-      <!-- 它还有一个标题 -->
-      <template #header>{{item.name}}</template>
-      <el-image style="width: 100px; height: 100px" :src="srcList[index]"
-      :zoom-rate="1.2"
-        :max-scale="7"
-        :min-scale="0.2"
-        :preview-src-list="srcList"
-        :initial-index="index"
-        fit="cover" />
-      <el-button round type="danger" plain @click="handleLike(item)">
-        <i class="fi fi-rr-heart" v-show="!item.isCollected"></i>
-        <i class="fi fi-sr-heart" v-show="item.isCollected"></i>
-      </el-button>
-      <!-- 它还有很多个标签， -->
-      <el-tag type="warning" v-for="(tag,index) in item.tags"  :key="index" >{{ tag }}</el-tag>
-    </el-card>
+      </div>
+    </el-col>
+    <el-col :span="12" style="background-color:rgb(248, 244, 251);">
+
+      <!-- 用户可以输入数字，决定搜索多少张图片 -->
+      <el-form-item label="请输入想获得的图片数量：" v-bind:class="{ error: isError }" class="input_number_class">
+        <el-input-number v-model="inputNumber" @change="clearErrorBorder" :max="30" step="1" :min="1" />
+        <div class="errorText">{{ errorMsg }}</div>
+      </el-form-item>
+
+      <el-form-item>
+        <el-button type="success" size="large" @click="onSubmit" color="#626aef" :dark="isDark"
+          style="margin-left: auto;margin-right: auto;width: 70px;"> 搜索</el-button>
+      </el-form-item>
+      <div class="contain"></div>
+      <!-- 加一个按钮，可以只看喜欢 -->
+      <el-form-item label="是否只显示你喜欢的图片" class="input_number_class">
+        <el-switch v-model="like" @change="onlyLike" active-text="只看喜欢" inactive-text="都看"
+          style="--el-switch-on-color: #e518bc; --el-switch-off-color: grey" />
+      </el-form-item>
+      <el-form-item label="这些是你可能需要的标签：" class="input_number_class">
+        <div class="choosetags" v-show="getlength()">
+          <!-- 做一些标签，可以选择是否删掉 -->
+          <el-check-tag v-for="(tag, index) in tags" :key="index" :checked="tag.checked" @change="onChange(tag)"
+            type="warning" :disable-transitions="false" effect="dark">
+            {{ tag.name }}
+          </el-check-tag>
+          <div class="withdrawTags">
+            <!-- 加一个按钮可以撤回对标签的修改 -->
+            <el-tooltip content="撤销修改" effect="customized" class="box-item" placement="right">
+              <el-button :icon="RefreshLeft" @click="withdrawTags" style="width: 60px;" />
+            </el-tooltip>
+          </div>
+        </div>
+      </el-form-item>
+    </el-col>
+  </el-row>
+  <div v-show="getlength()">
+    <!-- 显示当前结果数量 -->
+    <div class="mine-h2">
+      <h2>当前结果数量：<span style="color: #e518bc;">{{ ans_count }}</span> </h2>
+     <h4>点击图片可以放大查看哦！</h4>
     </div>
+   
+    <!-- 构建一个有9张图的图片墙 -->
+    <!-- 做一个卡片，它包括image，button -->
+    <el-row :gutter="20" >
+      <el-col :span="8" v-for="(item, index) in list" :key="index" v-show="tagInList(item)">
+        <div>
+          <el-card style="max-width: 250px;height: 330px;margin: 10px;position: relative;" shadow="hover" v-show="!like || item.isCollected">
+            <!-- 它还有一个标题 -->
+            <template #header>{{ item.name }}</template>
+            <el-image style="width: 200px; height: 100px" :src="srcList[index]" :zoom-rate="1.2" :max-scale="7"
+              :min-scale="0.2" :preview-src-list="srcList" :initial-index="index" fit="cover" />
+            <div class="showtags">
+              <span>标签：</span>
+              <!-- 它还有很多个标签， -->
+              <!-- 如果有一个div包裹着很多个button 我希望某个button距离div的下边界的距离固定为20px，
+              应该怎么写css -->
+              <el-tag type="warning" v-for="(tag, index) in item.tags" :key="index">{{ tag }}</el-tag>
+            </div>
+            <el-button size="large" round type="danger" plain 
+            style="width: 80px;position: absolute;left: 50%;transform: translateX(-50%); bottom: 20px;" @click="handleLike(item)">
+              <i class="fi fi-rr-heart" v-show="!item.isCollected"></i>
+              <i class="fi fi-sr-heart" v-show="item.isCollected"></i>
+            </el-button>
+          </el-card>
+        </div>
+      </el-col>
+    </el-row>
+  </div>
 </template>
 <script setup>
 
 import origin from '@/apis/origin'
 import { ref, onMounted } from 'vue'
 import { Search, RefreshLeft } from '@element-plus/icons-vue'
-const ans_count=ref(0)
+const ans_count = ref(0)
 const imageUrl = ref('')
 const inputNumber = ref(9)
 const isError = ref(false)
 const errorMsg = ref('')
-const likeThis=ref(false)
+const likeThis = ref(false)
 const tagInList = (item) => {
   return tags.value.some(a => a.checked && item.tags.includes(a.name));
+}
+const clearErrorBorder = () => {
+  isError.value = false
+  errorMsg.value = ''
 }
 const withdrawTags = () => {
   console.log('撤销')
   tags.value.forEach(item => {
     item.checked = true;
   }
-)
+  )
+}
+const getlength = () => {
+  if (tags.value.length > 0)
+    return true
+  else
+    return false
 }
 const onChange = (item) => {
   item.checked = !item.checked
@@ -99,30 +131,39 @@ const shouldShow = (item) => {
 const list = ref([]);
 const like = ref(false)
 const onlyLike = () => {
-  like.value = !like.value
   console.log(like.value)
   getans_count()
 }
-const url2= new URL('@/assets/dataset/im2.jpg', import.meta.url).href
+const url2 = new URL('@/assets/dataset/im2.jpg', import.meta.url).href
 const todisplay = ref()
 const topost = ref()
 const url = ref()
-const handleLike = async(item) => {
+const handleLike = async (item) => {
   item.isCollected = !item.isCollected
   //向后端传递请求
-   try {
-     const formData = {
-       info:{filename: item.name,
-      like: item.isCollected ? 1 : 0}
-     }  
-    console.log("like=",formData.info.like)
-    const newdata =  await origin.likeImage(formData);
-    console.log('数据保存成功,msg为'+newdata)
+  try {
+    const formData = {
+      info: {
+        filename: item.name,
+        like: item.isCollected ? 1 : 0
+      }
+    }
+    console.log("like=", formData.info.like)
+    const newdata = await origin.likeImage(formData);
+    console.log('数据保存成功,msg为' + newdata)
   } catch (error) {
     console.error('点赞时出错：', error);
   }
 }
-const imageLike =async () => {
+import { ElMessage } from 'element-plus'
+const imageLike = async () => {
+  if (!uploadImg.value) {
+    ElMessage({
+      message: '你还没有上传图片哦',
+      type: 'warning',
+    })
+    return
+  }
   likeThis.value = !likeThis.value
   //向后端传递请求
   try {
@@ -138,10 +179,10 @@ const imageLike =async () => {
     console.error('点赞时出错：', error);
   }
 }
-const uploadImg=ref()
+const uploadImg = ref()
 const handleTest = (newFile) => {
   console.log(newFile.name)
-  uploadImg.value= newFile.name
+  uploadImg.value = newFile.name
   let new_url = new URL(transformImagePath(newFile.name), import.meta.url).href
   console.log(new_url)
   console.log(url2)
@@ -177,7 +218,7 @@ function transformImagePath(path) {
   // 构造新路径，使用 '@/dataset/' 作为前缀并接上文件名  
   return `../assets/dataset/${fileName}`;
 }
-const onSubmit = async() => {
+const onSubmit = async () => {
   errorMsg.value = "";
   isError.value = false;
   let inputNumberValue = parseInt(inputNumber.value, 10);
@@ -186,12 +227,21 @@ const onSubmit = async() => {
     isError.value = true
     return
   }
+  if (!uploadImg.value) {
+    ElMessage({
+      message: '你还没有上传图片哦',
+      type: 'warning',
+    })
+    return
+  }
   //然后开始执行请求
   try {
     const formData = {
-      info:{filename: uploadImg.value,
-      queryNumber: inputNumberValue}
-    }  
+      info: {
+        filename: uploadImg.value,
+        queryNumber: inputNumberValue
+      }
+    }
     console.log(inputNumberValue)
     const newdata = await origin.doimgUpload(formData);
     //console.log(newdata.like)
@@ -203,7 +253,7 @@ const onSubmit = async() => {
     list.value = newdata.list.map(item => ({
       name: item.filename,
       isCollected: item.isCollected,
-      tags:item.tags
+      tags: item.tags
     }))
     console.log(list)
     console.log('数据保存成功')
@@ -225,59 +275,110 @@ const onSubmit = async() => {
   getans_count()
 }
 const getans_count = () => {
-  ans_count.value= list.value.filter(item => shouldShow(item)).length;
+  ans_count.value = list.value.filter(item => shouldShow(item)).length;
 }
 onMounted(() => {
-  inputNumber.value=9
+  inputNumber.value = 9
   url.value = transformImagePath('/im2.jpg')
   console.log(url.value)
-  tags.value = [
-  ]
+  tags.value = []
   srcList.value = [];
-  list.value=[]
-  ans_count.value=0
+  list.value = []
+  ans_count.value = 0
 })
 
 </script>
 
 <style scoped>
-.avatar-uploader .avatar {
-  width: 178px;
-  height: 178px;
+.mine-h2 {
+  margin-top: 30px;
+  margin-bottom: 10px;
 }
-.custom-like-button {  
-  color: #b15fe1; /* 当喜欢时为这个颜色 */  
-  /* 可以添加更多样式 */  
-}  
-  
-.custom-dislike-button {  
-  color: black; /* 当不喜欢时为这个颜色 */  
-  /* 可以添加更多样式 */  
-}  
+
+.contain {
+  /* 占位 */
+  height: 40px;
+}
+
+.withdrawTags {
+  margin-top: 2px;
+}
+
+.recButton {
+  margin-bottom: 40px;
+  width: 300px
+}
+
+.input_number_class {
+  margin: 20px;
+}
+
+.color_light {
+  background-color: rgb(252, 245, 246);
+  height: 360px
+}
+
+
+
+.avatar-uploader {
+  width: 400px;
+  height: 300px;
+  margin-left: auto;
+  margin-right: auto;
+  align-items: center;
+  display: flex;
+}
+
+.avatar_image {
+  width: 360px;
+  height: 270px;
+}
+
+.custom-like-button {
+  color: #b15fe1;
+  /* 当喜欢时为这个颜色 */
+  /* 可以添加更多样式 */
+}
+
+.custom-dislike-button {
+  color: black;
+  /* 当不喜欢时为这个颜色 */
+  /* 可以添加更多样式 */
+}
+
 .search {
   margin-top: 50px
 }
+
 .tooltip-base-box .box-item {
   width: 110px;
   margin-top: 10px;
 }
+
 .demo-image__error .image-slot {
   font-size: 30px;
 }
+
 .demo-image__error .image-slot .el-icon {
   font-size: 30px;
 }
+
 .demo-image__error .el-image {
   width: 100%;
   height: 200px;
 }
 </style>
 <style>
-.my_header1{
+.showtags {
+  margin: 10px;
+}
+
+.my_header1 {
   padding-top: 10px;
   margin-bottom: 30px;
   font-size: xx-large;
 }
+
 .el-popper.is-customized {
   /* Set padding to ensure the height is 32px */
   padding: 6px 12px;
@@ -288,11 +389,13 @@ onMounted(() => {
   background: linear-gradient(45deg, #b2e68d, #bce689);
   right: 0;
 }
+
 .avatar-uploader .el-upload {
   border: 1px dashed var(--el-border-color);
   border-radius: 6px;
   cursor: pointer;
-  position: relative;
+  margin-left: auto;
+  margin-right: auto;
   overflow: hidden;
   transition: var(--el-transition-duration-fast);
 }
@@ -302,21 +405,24 @@ onMounted(() => {
 }
 
 .el-icon.avatar-uploader-icon {
-  font-size: 28px;
+  font-size: 80px;
   color: #8c939d;
-  width: 178px;
-  height: 178px;
+  width: 360px;
+  height: 270px;
   text-align: center;
 }
-.errorText{
-    font-size: 10px;
-    height: 0;
-    width: 100%;
-    color: var(--el-color-error);
-    transform: translateY(-15px);
+
+.errorText {
+  font-size: 10px;
+  color: var(--el-color-error);
+  transform: translateY(-15px);
+  margin-right: 100px;
+  margin-top: 10px;
+  white-space: nowrap;
+  /* 不自动换行 */
 }
 
-.error .el-input{
-    --el-input-border-color:var(--el-color-error)
+.error .el-input {
+  --el-input-border-color: var(--el-color-error)
 }
 </style>

@@ -1,30 +1,35 @@
 <template>
-    <h1 class="my_header1">这些是您喜欢的图片</h1>
-    <el-button @click="refreshLike"> 刷新</el-button>
+    <div style="padding-top: 10px;font-size: xx-large;">这些是您喜欢的图片
+        你喜欢的图片有：<span style="color: #e518bc;">{{ ans_count }}</span>&nbsp; 张
+    </div>
+    <h2 style="margin-bottom: 10px;">点击图片可以&nbsp; <span style="color: #216ce6;">放大</span>&nbsp; 查看哦！ </h2>
+    <el-button @click="refreshLike" class="mine-refresh" size="large" round color="#626aef" :dark="isDark">
+        &nbsp;刷新&nbsp;</el-button>
+    <div style="height: 80px;"></div>
     <!-- 用一个标签显示目前有多少个喜欢的图片 -->
-    <div>
-        你喜欢的图片有：{{ ans_count }} 张
-      </div>
-      <!-- 做一个卡片，它包括image，button -->
-      <div v-for="(item, index) in list" :key="index">
-        <el-card  style="max-width: 480px" shadow="hover" >
-          <!-- 它还有一个标题 -->
-          <template #header>{{ item.name }}</template>
-          <el-image style="width: 100px; height: 100px" :src="srcList[index]"
-          :zoom-rate="1.2"
-            :max-scale="7"
-            :min-scale="0.2"
-            :preview-src-list="srcList"
-            :initial-index="index"
-            fit="cover" />
-          <el-button round type="danger" plain @click="handleLike(item)">
-            <i class="fi fi-rr-heart" v-show="!item.isCollected"></i>
-            <i class="fi fi-sr-heart" v-show="item.isCollected"></i>
-          </el-button>
-          <!-- 它还有很多个标签， -->
-          <el-tag type="warning" v-for="(tag, index) in item.tags"  :key="index" >{{ tag }}</el-tag>
-        </el-card>
+    <el-row :gutter="20" class="my-row">
+        <!-- 做一个卡片，它包括image，button -->
+        <div v-for="(item, index) in list" :key="index">
+            <el-col :span="8" style="max-width: 480px" shadow="hover">
+                <el-card style="max-width: 250px;height: 330px;margin: 10px;position: relative;"
+                 shadow="hover">
+                <!-- 它还有一个标题 -->
+                <template #header>{{ item.name }}</template>
+                <el-image style="width: 200px; height: 100px" :src="srcList[index]" :zoom-rate="1.2" :max-scale="7"
+                    :min-scale="0.2" :preview-src-list="srcList" :initial-index="index" fit="cover" />
+                <div class="showtags">
+                  <span>标签：</span>
+                  <el-tag type="warning" v-for="(tag, index) in item.tags" :key="index">{{ tag }}</el-tag>
+                </div>
+                    <el-button size="large" round type="danger" plain 
+                style="width: 80px;position: absolute;left: 50%;transform: translateX(-50%); bottom: 20px;" @click="handleLike(item)">
+                    <i class="fi fi-rr-heart" v-show="!item.isCollected"></i>
+                    <i class="fi fi-sr-heart" v-show="item.isCollected"></i>
+                </el-button>
+                </el-card>
+            </el-col>
         </div>
+    </el-row>
 </template>
 <script setup>
 import { ref, onMounted } from 'vue'
@@ -40,7 +45,7 @@ function transformImagePath(path) {
     return `../assets/dataset/${fileName}`;
 }
 const updateSrc = () => {
-        ans_count.value = list.value.length
+    ans_count.value = list.value.length
     // 清空 srcList  
     srcList.value = [];
     // 遍历 list 中的每个对象  
@@ -88,7 +93,7 @@ const refreshLike = async () => {
     }
     updateSrc()
 }
-onMounted(async() => {
+onMounted(async () => {
     try {
         const newdata = await origin.getAllLikes();
         list.value = newdata.list.map(item => ({
@@ -104,4 +109,14 @@ onMounted(async() => {
 })
 </script>
 
-<style scoped></style>
+<style scoped>
+.mine-refresh {
+    margin-bottom: 20px;
+    float: right;
+    margin-right: 20px;
+}
+
+.my-row {
+    float: center
+}
+</style>
