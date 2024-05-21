@@ -11,7 +11,7 @@ import { particles } from '@/components/particles/1.js'
       <el-header>
         <el-menu :default-active="activeIndex2" mode="horizontal" position=fixed top=0 left=0 width=100% display=flex
           justify-content=center align-items=center background-color="#545c64" text-color="#fff"
-          active-text-color="#ffd04b" @select="handleSelect">
+          active-text-color="#ffb8c6" @select="handleSelect">
           <el-menu-item index="1">图片搜索</el-menu-item>
           <el-menu-item index="2" class="inRight">我的喜欢</el-menu-item>
         </el-menu>

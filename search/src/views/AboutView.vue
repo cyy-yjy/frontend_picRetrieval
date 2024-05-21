@@ -1,6 +1,6 @@
 <template>
     <div style="padding-top: 10px;font-size: xx-large;">这些是您喜欢的图片
-        你喜欢的图片有：<span style="color: #e518bc;">{{ ans_count }}</span>&nbsp; 张
+        您喜欢的图片有：<span style="color: #e518bc;">{{ ans_count }}</span>&nbsp; 张
     </div>
     <h2 style="margin-bottom: 10px;">点击图片可以&nbsp; <span style="color: #216ce6;">放大</span>&nbsp; 查看哦！ </h2>
     <el-button @click="refreshLike" class="mine-refresh" size="large" round color="#626aef" :dark="isDark">
@@ -103,7 +103,7 @@ onMounted(async () => {
         }))
         console.log('刷新成功,msg为' + newdata)
     } catch (error) {
-        console.error('点赞时出错：', error);
+        console.error('获取点赞列表时出错：', error);
     }
     updateSrc()
 })
