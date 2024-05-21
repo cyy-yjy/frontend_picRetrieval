@@ -2,23 +2,21 @@
   <!-- 首先是标题 -->
   <h1 class="my_header1">上传图片吧！</h1>
   <el-row :gutter="24">
-    <el-col :span="12">
+    <el-col :span="12" style="background-color: rgb(252, 247, 245); min-height: 360px">
       <!-- 通过span确定了这块区域占多大 -->
-      <div class="color_light">
-        <!-- 实际上，这里只需要获取图片的name就行啦 -->
-        <el-upload class="avatar-uploader" :show-file-list="false" :auto-upload="false" :on-change="handleTest">
-          <el-image v-if="imageUrl" :src="imageUrl" class="avatar_image" fit="scale-down" />
-          <el-icon v-else class="avatar-uploader-icon">
-            <Plus />
-          </el-icon>
-        </el-upload>
-        <el-button type="danger" plain @click="imageLike" class="recButton">
-          <i class="fi fi-rr-heart" v-show="!likeThis"></i>
-          <i class="fi fi-sr-heart" v-show="likeThis"></i>
-        </el-button>
-      </div>
+      <!-- 实际上，这里只需要获取图片的name就行啦 -->
+      <el-upload class="avatar-uploader" :show-file-list="false" :auto-upload="false" :on-change="handleTest">
+        <el-image v-if="imageUrl" :src="imageUrl" class="avatar_image" fit="scale-down" />
+        <el-icon v-else class="avatar-uploader-icon">
+          <Plus />
+        </el-icon>
+      </el-upload>
+      <el-button type="danger" plain @click="imageLike" class="recButton">
+        <i class="fi fi-rr-heart" v-show="!likeThis"></i>
+        <i class="fi fi-sr-heart" v-show="likeThis"></i>
+      </el-button>
     </el-col>
-    <el-col :span="12" style="background-color:rgb(248, 244, 251);">
+    <el-col :span="12" style="background-color:rgb(247, 244, 251);">
 
       <!-- 用户可以输入数字，决定搜索多少张图片 -->
       <el-form-item label="请输入想获得的图片数量：" v-bind:class="{ error: isError }" class="input_number_class">
@@ -36,36 +34,38 @@
         <el-switch v-model="like" @change="onlyLike" active-text="只看喜欢" inactive-text="都看"
           style="--el-switch-on-color: #e518bc; --el-switch-off-color: grey" />
       </el-form-item>
-      <el-form-item label="这些是你可能需要的标签：" class="input_number_class">
-        <div class="choosetags" v-show="getlength()">
-          <!-- 做一些标签，可以选择是否删掉 -->
-          <el-check-tag v-for="(tag, index) in tags" :key="index" :checked="tag.checked" @change="onChange(tag)"
-            type="warning" :disable-transitions="false" effect="dark">
-            {{ tag.name }}
-          </el-check-tag>
-          <div class="withdrawTags">
-            <!-- 加一个按钮可以撤回对标签的修改 -->
-            <el-tooltip content="撤销修改" effect="customized" class="box-item" placement="right">
-              <el-button :icon="RefreshLeft" @click="withdrawTags" style="width: 60px;" />
-            </el-tooltip>
-          </div>
+      <el-form-item label="这些是你可能需要的标签，你可以排除掉一些标签" class="input_number_class" style="margin-bottom: 1px;">
+        <div class="withdrawTags">
+          <!-- 加一个按钮可以撤回对标签的修改 -->
+          <el-tooltip content="撤销修改" effect="customized" class="box-item" placement="right">
+            <el-button :icon="RefreshLeft" @click="withdrawTags" style="width: 60px;" />
+          </el-tooltip>
         </div>
       </el-form-item>
+      <div class="choosetags" v-show="getlength()">
+        <!-- 做一些标签，可以选择是否删掉 -->
+        <el-check-tag v-for="(tag, index) in tags" :key="index" :checked="tag.checked" @change="onChange(tag)"
+          type="warning" :disable-transitions="false" effect="dark" style="margin: 2px;">
+          {{ tag.name }}
+        </el-check-tag>
+      </div>
+
     </el-col>
   </el-row>
   <div v-show="getlength()">
     <!-- 显示当前结果数量 -->
     <div class="mine-h2">
       <h2>当前结果数量：<span style="color: #e518bc;">{{ ans_count }}</span> </h2>
-     <h4>点击图片可以放大查看哦！</h4>
+      <h4>点击图片可以放大查看哦！</h4>
     </div>
-   
+
     <!-- 构建一个有9张图的图片墙 -->
     <!-- 做一个卡片，它包括image，button -->
-    <el-row :gutter="20" >
+    <el-row :gutter="20">
       <el-col :span="8" v-for="(item, index) in list" :key="index" v-show="tagInList(item)">
         <div>
-          <el-card style="max-width: 250px;height: 330px;margin: 10px;position: relative;" shadow="hover" v-show="!like || item.isCollected">
+          <el-card style="max-width: 250px;height: 330px;margin: 10px;position: relative;" shadow="hover"
+            v-show="!like || item.isCollected">
             <!-- 它还有一个标题 -->
             <template #header>{{ item.name }}</template>
             <el-image style="width: 200px; height: 100px" :src="srcList[index]" :zoom-rate="1.2" :max-scale="7"
@@ -77,8 +77,9 @@
               应该怎么写css -->
               <el-tag type="warning" v-for="(tag, index) in item.tags" :key="index">{{ tag }}</el-tag>
             </div>
-            <el-button size="large" round type="danger" plain 
-            style="width: 80px;position: absolute;left: 50%;transform: translateX(-50%); bottom: 20px;" @click="handleLike(item)">
+            <el-button size="large" round type="danger" plain
+              style="width: 80px;position: absolute;left: 50%;transform: translateX(-50%); bottom: 20px;"
+              @click="handleLike(item)">
               <i class="fi fi-rr-heart" v-show="!item.isCollected"></i>
               <i class="fi fi-sr-heart" v-show="item.isCollected"></i>
             </el-button>
@@ -290,6 +291,10 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.choosetags {
+  margin-bottom: 20px;
+}
+
 .mine-h2 {
   margin-top: 30px;
   margin-bottom: 10px;
@@ -301,7 +306,7 @@ onMounted(() => {
 }
 
 .withdrawTags {
-  margin-top: 2px;
+  margin-top: 0px;
 }
 
 .recButton {
@@ -315,7 +320,7 @@ onMounted(() => {
 
 .color_light {
   background-color: rgb(252, 245, 246);
-  height: 360px
+  min-height: 360px
 }
 
 
