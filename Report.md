@@ -14,34 +14,29 @@ Various actions can be performed on the search image results, such as bookmarkin
 #### 2.1. Formulation  
 
 Click on the "+" box in the middle to select the image to be uploaded, the image should be in the dataset folder.
-
-![初始界面](.\images\1.jpg)
+<img src=".\images\1.jpg" />
 
 
 
 After selecting the image, the image will appear in the box position. If you click on the image again, you can re-select the image.
-
-![Preview and Reselect the Image](.\images\2.png)
+<img src=".\images\2.png" />
 
 
 
 The heart button at the bottom will add the selected image to your favourites.   
-
-![](.\images\3.png)
+<img src=".\images\3.png" />
 
 
 
 #### 2.2. Initiation of action  
 
 You can change the number of searched results below the image.
-
-![](.\images\4.jpg)
+<img src=".\images\4.jpg" />
 
 
 
 Click the search button to start searching.  
-
-![](.\images\5.png)
+<img src=".\images\5.png" />
 
 
 
@@ -51,33 +46,30 @@ Click the search button to start searching.
 
 Overview of search results, which shows how many images have been searched for in total and shows the name of each image and the tags attached to the image in the search results. Also shows tags for all search results. 
 
-![](.\images\6.png)
-
+<img src=".\images\6.png" />
 
 
 
 
 Click the heart button to the right of the image to add it to your favorates.
-![](.\images\8.jpg)
+<img src=".\images\8.jpg" />
 
 Standalone images can be viewed in preview.
 
 <img src=".\images\7.jpg" style="zoom:80%;" />
 
 #### 2.4. Refinement
-  ！[只看喜欢]() 
 
 Click on Only Like to view only the parts of the search results that have been added to your favourites.
+<img src=".\images\9.png" />
 
-![image-20240521195409473](.\images\9.png)
+<img src=".\images\10.png" />
 
-![](D:\vs_temp\images\10.png)
 
 
 
 Click on the tabs above to filter by tab. When a tag turns yellow, images containing that tag are shown, and when the tag turns grey after clicking, images not containing that tag are hidden.
-
-![](D:\vs_temp\images\11.jpg)
+<img src=".\images\11.jpg" />
 
 
 
